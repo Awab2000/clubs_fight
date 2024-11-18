@@ -40,62 +40,59 @@ def display_background_image():
     Display.blit(BACKGROUND, (0, 0))
 
 
-def delay_time():
+def delay_time(n, period):
     i = 0
-    while i < 200:
-        pygame.time.delay(10)
+    while i < n:
+        pygame.time.delay(period)
         i += 1
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                i = 201
+                i = n+1
                 pygame.quit()
 
 
+def write_on_screen(font_type, font_size, font_color, message, pos_x, pos_y, take_width = False):
+    font = pygame.font.SysFont(font_type, font_size)
+    text = font.render(message, 1, font_color)
+    if take_width:
+        Display.blit(text, (766 - (text.get_width() / 2), pos_y))
+    else:
+        Display.blit(text, (pos_x, pos_y))
+
+
+def check_quit():
+    for event in pygame.event.get():
+        if event.type == QUIT:
+            pygame.quit()
 
 def game_intro():
-    global start_time
-    intro = True
-    while intro:
-        start_time = False
+    while True:
         display_background_image()
-        font2 = pygame.font.SysFont("comicsans", 100)
-        text = font2.render("CLUBS FIGHT", 1, WHITE)
-        Display.blit(text, (766 - (text.get_width() / 2), 175))
-        pygame.draw.rect(Display, WHITE, (350, 490, 250, 60))
-        text00= font00.render("Play", 1, BLACK)
-        Display.blit(text00, (430 , 500))
-        pygame.draw.rect(Display, WHITE, (850, 490, 250, 60))
-        text01 = font00.render("High Score", 1, BLACK)
-        Display.blit(text01, (865, 500))
-        font4 = pygame.font.SysFont("comicsans", 50)
-        text4 = font4.render("How to play: use the arrows to avoid the rival and reach the Champions league cup", 1, WHITE)
-        Display.blit(text4, (766 - (text4.get_width() / 2), 700))
-        pygame.display.update()
-        for event in pygame.event.get():
-            if event.type == QUIT:
-                pygame.quit()
+        write_on_screen("comicsans", 100, WHITE, "CLUBS FIGHT", 766 - (750 // 2), 150)
+        pygame.draw.rect(Display, WHITE, (350, 490, BUTTONS_WIDTH, BUTTONS_HEIGHT))
+        write_on_screen("comicsans", 55, BLACK, "Play", 430, 475)
+        pygame.draw.rect(Display, WHITE, (850, 490, BUTTONS_WIDTH, BUTTONS_HEIGHT))
+        write_on_screen("comicsans", 45, BLACK, "High Score", 860, 485)
+        write_on_screen("comicsans", 30, WHITE, "Playing instruction: Use the arrows to avoid the rival and reach the Champions league cup", 150, 700)
+        check_quit()
         cur = pygame.mouse.get_pos()
         click = pygame.mouse.get_pressed()
-        if 350 + 250 > cur[0] > 350  and 60 + 490 > cur[1] > 490 :
-            pygame.draw.rect(Display, SILVER, (350, 490, 250, 60))
-            text02 = font00.render("Play", 1, BLACK)
-            Display.blit(text02, (430, 500))
-            pygame.display.update()
+        if 350 + BUTTONS_WIDTH > cur[0] > 350  and BUTTONS_HEIGHT + 490 > cur[1] > 490 :
+            pygame.draw.rect(Display, SILVER, (350, 490, BUTTONS_WIDTH, BUTTONS_HEIGHT))
+            write_on_screen("comicsans", 55, BLACK, "Play", 430, 475)
             if click[0] == 1 :
-                intro = False
-        if 850 + 250 > cur[0] > 850  and 60 + 490 > cur[1] > 490 :
-            pygame.draw.rect(Display, SILVER, (850, 490, 250, 60))
-            text03 = font00.render("High Score", 1, BLACK)
-            Display.blit(text03, (865, 500))
-            pygame.display.update()
+                delay_time(50,5)
+                break
+        if 850 + BUTTONS_WIDTH > cur[0] > 850  and BUTTONS_HEIGHT + 490 > cur[1] > 490 :
+            pygame.draw.rect(Display, SILVER, (850, 490, BUTTONS_WIDTH, BUTTONS_HEIGHT))
+            write_on_screen("comicsans", 45, BLACK, "High Score", 860, 485)
             if click[0] == 1 :
                 view_high()
-
+        pygame.display.update()
 
 def choose():
     choose = True
     while choose:
-        start_time = False
         display_background_image()
         positions = [(300, 300), (400, 300), (500, 300), (600, 300), (700, 300), (800, 300), (900, 300), (1000, 300), (300, 500), (400, 500), (500, 500),
                      (600, 500), (700, 500), (800, 500), (900, 500), (1000, 500), (1100, 500), (1100, 300), (1200, 300), (1200, 500)]
@@ -105,13 +102,9 @@ def choose():
             team.draw_logo()
             team.is_turn = False
 
-        font3 = pygame.font.SysFont("comicsans", 100)
-        text3 = font3.render("Choose a team to start the game", 1, WHITE)
-        Display.blit(text3, (766 - (text3.get_width() / 2), 140))
-        pygame.display.update()
-        for event in pygame.event.get():
-            if event.type == QUIT:
-                pygame.quit()
+        write_on_screen("comicsans", 70, WHITE, "Choose a team to start the game", 230, 110)
+        check_quit()
+
         cur = pygame.mouse.get_pos()
         click = pygame.mouse.get_pressed()
         for team in teams:
@@ -120,43 +113,33 @@ def choose():
                     team.is_turn = True
                     team.play_chant()
                     choose = False
+                    delay_time(50, 5)
                     break
+        pygame.display.update()
 
 
 def view_high():
-    view = True
-    while view:
-        start_time = False
+    while True:
         display_background_image()
-        text6 = font5.render("HIGH SCORE", 1, WHITE)
-        Display.blit(text6, (766 - (text6.get_width() / 2), 175))
-        text7 = font5.render(user_text + ': ' + str(highscore) + " seconds", 1, WHITE)
-        Display.blit(text7, (766 - (text7.get_width() / 2), 340))
-        pygame.draw.rect(Display, WHITE, (620, 550, 250, 60))
-        text9 = font00.render("Back", 1, BLACK)
-        Display.blit(text9, (685 , 565))
-        pygame.display.update()
-        for event in pygame.event.get():
-            if event.type == QUIT:
-                pygame.quit()
+        write_on_screen("comicsans", 70, WHITE, "HIGH SCORE", 525, 175)
+        write_on_screen("comicsans", 70, WHITE, user_text + ': ' + str(HIGH_SCORE) + " seconds", 410, 340, True)
+        pygame.draw.rect(Display, WHITE, (620, 550, BUTTONS_WIDTH, BUTTONS_HEIGHT))
+        write_on_screen("comicsans", 55, BLACK, "Back", 680, 540)
+        check_quit()
         cur = pygame.mouse.get_pos()
         click = pygame.mouse.get_pressed()
-        if 620 + 250 > cur[0] > 620 and 60 + 550 > cur[1] > 550 :
-            pygame.draw.rect(Display, SILVER, (620, 550, 250, 60))
-            text10 = font00.render("Back", 1, BLACK)
-            Display.blit(text10, (685, 565))
-            pygame.display.update()
+        if 620 + BUTTONS_WIDTH > cur[0] > 620 and BUTTONS_HEIGHT + 550 > cur[1] > 550 :
+            pygame.draw.rect(Display, SILVER, (620, 550, BUTTONS_WIDTH, BUTTONS_HEIGHT))
+            write_on_screen("comicsans", 55, BLACK, "Back", 680, 540)
             if click[0] == 1 :
-                view = False
+                break
+        pygame.display.update()
 
 def entry():
-    entry = True
     global user_text
-    while entry:
-        start_time = False
+    while True:
         display_background_image()
-        text10 = font5.render("Type your name:", 1, WHITE)
-        Display.blit(text10, (766 - (text10.get_width() / 2), 175))
+        write_on_screen("comicsans", 60, WHITE, "Type your name:", 490, 175, True)
         for event in pygame.event.get():
             if event.type == QUIT:
                 pygame.quit()
@@ -165,23 +148,23 @@ def entry():
                     user_text = user_text[:-1]
                 else:
                     user_text += event.unicode
-                with open(Name, 'w', encoding='UTF-8') as file:
-                    file.write(user_text)
-        text11 = font5.render(user_text, 1, WHITE)
-        Display.blit(text11, (766 - (text11.get_width() / 2), 340))
-        pygame.draw.rect(Display, WHITE, (620, 550, 250, 60))
-        text12 = font00.render("Save", 1, BLACK)
-        Display.blit(text12, (685, 565))
-        pygame.display.update()
+
+        write_on_screen("comicsans", 60, WHITE, user_text, 490, 340, True)
+        pygame.draw.rect(Display, WHITE, (620, 550, BUTTONS_WIDTH, BUTTONS_HEIGHT))
+        write_on_screen("comicsans", 60, BLACK, "Save", 685, 530)
+
         cur = pygame.mouse.get_pos()
         click = pygame.mouse.get_pressed()
-        if 620 + 250 > cur[0] > 620 and 60 + 550 > cur[1] > 550:
-            pygame.draw.rect(Display, SILVER, (620, 550, 250, 60))
-            text13 = font00.render("Save", 1, BLACK)
-            Display.blit(text13, (685, 565))
-            pygame.display.update()
+        if 620 + BUTTONS_WIDTH > cur[0] > 620 and BUTTONS_HEIGHT + 550 > cur[1] > 550:
+            pygame.draw.rect(Display, SILVER, (620, 550, BUTTONS_WIDTH, BUTTONS_HEIGHT))
+            write_on_screen("comicsans", 60, BLACK, "Save", 685, 530)
             if click[0] == 1:
-                entry = False
+                with open(Name, 'w', encoding='UTF-8') as file:
+                    file.write(user_text)
+                with open(High_score, 'w', encoding='UTF-8') as file:
+                    file.write(str(HIGH_SCORE))
+                break
+        pygame.display.update()
 
 class player:
     def __init__(self,x = 0, y = 0, width = 40, height = 54):
@@ -194,9 +177,9 @@ class player:
 
     def draw(self):
         for team in teams:
-            team.pos_x = self.x
-            team.pos_y = self.y
             if team.is_turn:
+                team.pos_x = self.x
+                team.pos_y = self.y
                 team.draw_logo()
                 break
         self.hitbox = (self.x , self.y, self.width, self.height)
@@ -204,47 +187,31 @@ class player:
     def hit(self):
         self.x = 0
         self.y = 0
-        font1 = pygame.font.SysFont("comicsans",100)
-        text = font1.render("YOU LOSE", 1, RED)
-        Display.blit(text,(766 - (text.get_width()/2),350))
+        write_on_screen("comicsans", 100, RED, "YOU LOSE", 490, 350, True)
         pygame.display.update()
-        delay_time()
-        play_background_sound()
-        game_intro()
-        choose()
+        delay_time(200,10)
+
 
     def win(self):
         self.x = 0
         self.y = 0
-        font2 = pygame.font.SysFont("comicsans",100)
-        text2 = font2.render("CONGRATS , YOU WON", 1, RED)
-        Display.blit(text2,(766 - (text2.get_width()/2),350))
+        write_on_screen("comicsans", 100, RED, "CONGRATS , YOU WON", 490, 350, True)
         pygame.display.update()
-        delay_time()
+        delay_time(200,10)
 
 
     def check_high(self):
         self.x = 0
         self.y = 0
-        global highscore
-        if time.seconds < highscore:
-            highscore = time.seconds
-            with open(High_score , 'w' , encoding= 'UTF-8') as file:
-                file.write(str(highscore))
-            self.win()
-            text2 = font5.render("New High Score!!!", 1, RED)
-            Display.blit(text2, (766 - (text2.get_width() / 2), 550))
+        self.win()
+        global HIGH_SCORE
+        if time.seconds < HIGH_SCORE:
+            HIGH_SCORE = time.seconds
+            write_on_screen("comicsans", 60, RED, "New High Score!!!", 490, 550, True)
             pygame.display.update()
-            delay_time()
+            delay_time(200,10)
             play_background_sound()
             entry()
-            game_intro()
-            choose()
-        else:
-            self.win()
-            play_background_sound()
-            game_intro()
-            choose()
 
 class enemy:
     def __init__(self, width = 40, height = 54):
@@ -259,9 +226,9 @@ class enemy:
     def draw(self):
         self.move()
         for team in teams:
-            team.rival_pos_x = self.x
-            team.rival_pos_y = self.y
             if team.is_turn:
+                team.rival_pos_x = self.x
+                team.rival_pos_y = self.y
                 team.draw_rival()
                 break
         self.hitbox = (self.x , self.y, self.width, self.height)
@@ -299,8 +266,7 @@ class Time:
         self.milliseconds = 0
 
     def draw(self,Display):
-        text5 = font5.render("{}".format(self.seconds), 1, WHITE)
-        Display.blit(text5, (self.x, self.y))
+        write_on_screen("comicsans", 60, WHITE, f'{self.seconds}', self.x, self.y)
         self.move_time()
 
     def move_time(self):
@@ -331,25 +297,23 @@ def RedrawGameWindow():
 def collapse():
     is_hit = False
     for enemy in enemies:
-        if is_hit:
-            break
         if player1.hitbox[1] < enemy.hitbox[1] + enemy.hitbox[3] and player1.hitbox[1] + player1.hitbox[3] > \
                 enemy.hitbox[1]:
             if player1.hitbox[0] + player1.hitbox[2] > enemy.hitbox[0] and player1.hitbox[0] < enemy.hitbox[0] + \
                     enemy.hitbox[2]:
                 is_hit = True
-                time.restart_time()
                 for ene in enemies:
                     ene.restart_position()
                 player1.hit()
+                break
 
-    if player1.hitbox[1] < cup.hitbox[1] + cup.hitbox[3] and player1.hitbox[1] + player1.hitbox[3] > cup.hitbox[1]:
+    if player1.hitbox[1] < cup.hitbox[1] + cup.hitbox[3] and player1.hitbox[1] + player1.hitbox[3] > cup.hitbox[1] and not is_hit:
         if player1.hitbox[0] + player1.hitbox[2] > cup.hitbox[0] and player1.hitbox[0] < cup.hitbox[0] + cup.hitbox[2]:
             player1.check_high()
-            time.restart_time()
+            is_hit = True
             for ene in enemies:
                 ene.restart_position()
-
+    return is_hit
 
 pygame.init()
 pygame.key.set_repeat()
@@ -364,6 +328,8 @@ BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 RED = (255, 0, 0)
 SILVER = (192, 192, 192)
+BUTTONS_WIDTH = 250
+BUTTONS_HEIGHT = 60
 FPS = 2000
 
 Liv = Team("Liv2.PNG","Anfield14.PNG","YNWA.mp3","ManU.PNG", 0, 0, 0, 500)
@@ -392,48 +358,45 @@ teams = [Liv, ManU, Atl, Rma, Fcb, Val, Int, Mil, Juv, Rom, Laz, Ars, Che, City,
 
 font5 = pygame.font.SysFont("comicsans", 60)
 clock = pygame.time.Clock()
-
+start_time = False
 High_score = "High_score.txt"
 with open(High_score, 'r', encoding='UTF-8') as file:
-    highscore = int(file.readline())
+    HIGH_SCORE = int(file.readline())
 
 Name = "Name.txt"
 with open(Name, 'r', encoding='UTF-8') as file:
     user_text = file.readline()
 
-font00 = pygame.font.SysFont("comicsans", 60)
-
-play_background_sound()
+font00 = pygame.font.SysFont("comicsans", 55)
 
 player1 = player()
 enemies = [enemy() for i in range(11)]
 cup = Trophy(1493, 722, 40, 68)
 time = Time(1450,0)
-game_intro()
-choose()
-Run = True
 if __name__ == '__main__':
-    while Run:
-        start_time = True
-        clock.tick(FPS)
-        collapse()
-        for event in pygame.event.get():
-            if event.type == QUIT:
-                Run = False
+    while True:
+        play_background_sound()
+        game_intro()
+        choose()
 
-        Keys = pygame.key.get_pressed()
-        if Keys[pygame.K_LEFT] and player1.x > 0 :
-            player1.x -= player1.vel
+        while True:
+            RedrawGameWindow()
+            start_time = True
+            clock.tick(FPS)
+            if (collapse()):
+                time.restart_time()
+                start_time = False
+                break
+            check_quit()
+            Keys = pygame.key.get_pressed()
+            if Keys[pygame.K_LEFT] and player1.x > 0 :
+                player1.x -= player1.vel
 
-        elif Keys [pygame.K_RIGHT] and player1.x < 1533 - player1.width:
-            player1.x += player1.vel
+            elif Keys [pygame.K_RIGHT] and player1.x < 1533 - player1.width:
+                player1.x += player1.vel
 
-        elif Keys [pygame.K_UP] and player1.y > 0 :
-            player1.y -= player1.vel
+            elif Keys [pygame.K_UP] and player1.y > 0 :
+                player1.y -= player1.vel
 
-        elif Keys [pygame.K_DOWN] and player1.y  < 790 - player1.height :
-            player1.y += player1.vel
-
-        RedrawGameWindow()
-
-    pygame.quit()
+            elif Keys [pygame.K_DOWN] and player1.y  < 790 - player1.height :
+                player1.y += player1.vel

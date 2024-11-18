@@ -55,7 +55,7 @@ clock = pygame.time.Clock()
 High_score = "High_score.txt"
 f = open(High_score,'r')
 s = f.readline()
-highscore = int(s)
+HIGH_SCORE = int(s)
 Name = "Name.txt"
 f2 = open(Name,'r')
 user_text = f2.readline()
@@ -343,7 +343,7 @@ def view_high():
         Display.blit(bg1, (0, 0))
         text6 = font5.render("HIGH SCORE", 1, White)
         Display.blit(text6, (766 - (text6.get_width() / 2), 175))
-        text7 = font5.render(user_text + ': ' + str(highscore) + " seconds", 1, White)
+        text7 = font5.render(user_text + ': ' + str(HIGH_SCORE) + " seconds", 1, White)
         Display.blit(text7, (766 - (text7.get_width() / 2), 340))
         pygame.draw.rect(Display, White, (620, 550, 250, 60))
         text9 = font00.render("Back", 1, Black)
@@ -489,7 +489,7 @@ class player:
     def high(self):
         self.x = 0
         self.y = 0
-        global highscore
+        global HIGH_SCORE
         if time.seconds < highscore:
             highscore = time.seconds
             with open(High_score , 'w' , encoding= 'UTF-8') as file:
