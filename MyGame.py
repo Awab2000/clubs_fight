@@ -159,14 +159,14 @@ def entry():
             pygame.draw.rect(Display, SILVER, (620, 550, BUTTONS_WIDTH, BUTTONS_HEIGHT))
             write_on_screen("comicsans", 60, BLACK, "Save", 685, 530)
             if click[0] == 1:
-                with open(Name, 'w', encoding='UTF-8') as file:
+                with open(player_name_file, 'w', encoding='UTF-8') as file:
                     file.write(user_text)
-                with open(High_score, 'w', encoding='UTF-8') as file:
+                with open(High_score_file, 'w', encoding='UTF-8') as file:
                     file.write(str(HIGH_SCORE))
                 break
         pygame.display.update()
 
-class player:
+class Player:
     def __init__(self,x = 0, y = 0, width = 40, height = 54):
         self.x = x
         self.y = y
@@ -190,6 +190,21 @@ class player:
         write_on_screen("comicsans", 100, RED, "YOU LOSE", 490, 350, True)
         pygame.display.update()
         delay_time(200,10)
+
+
+    def move(self):
+        Keys = pygame.key.get_pressed()
+        if Keys[pygame.K_LEFT] and self.x > 0:
+            self.x -= self.vel
+
+        elif Keys[pygame.K_RIGHT] and self.x < SCREEN_WIDTH - self.width:
+            self.x += self.vel
+
+        elif Keys[pygame.K_UP] and self.y > 0:
+            self.y -= self.vel
+
+        elif Keys[pygame.K_DOWN] and self.y < SCREEN_HEIGHT - self.height:
+            self.y += self.vel
 
 
     def win(self):
@@ -236,9 +251,9 @@ class enemy:
     def move(self):
         self.x += self.speedx
         self.y += self.speedy
-        if self.x <= 0 or self.x + self.width >= 1533:
+        if self.x <= 0 or self.x + self.width >= SCREEN_WIDTH:
             self.speedx = - self.speedx
-        if self.y <= 0 or self.y + self.height >= 790:
+        if self.y <= 0 or self.y + self.height >= SCREEN_HEIGHT:
             self.speedy = -self.speedy
 
     def restart_position(self):
@@ -264,13 +279,14 @@ class Time:
         self.y = y
         self.seconds = 0
         self.milliseconds = 0
+        self.start = False
 
     def draw(self,Display):
         write_on_screen("comicsans", 60, WHITE, f'{self.seconds}', self.x, self.y)
         self.move_time()
 
     def move_time(self):
-        if start_time:
+        if self.start:
             if self.milliseconds > 1000:
                 self.seconds += 1
                 self.milliseconds -= 1000
@@ -317,9 +333,9 @@ def collapse():
 
 pygame.init()
 pygame.key.set_repeat()
-screen_width = 1533
-screen_height = 790
-Display = pygame.display.set_mode((screen_width,screen_height))
+SCREEN_WIDTH = 1533
+SCREEN_HEIGHT = 790
+Display = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("CLUBS FIGHT")
 
 BACKGROUND = pygame.image.load("UCL2.PNG")
@@ -355,24 +371,22 @@ Psg = Team("PSG2.PNG", "Parc2.PNG", "PsgSong.mp3", "Marseille2.PNG", 0, 0, 0, 50
 
 teams = [Liv, ManU, Atl, Rma, Fcb, Val, Int, Mil, Juv, Rom, Laz, Ars, Che, City, Tot, Bay, Bvb, Ol, Om, Psg]
 
-
-font5 = pygame.font.SysFont("comicsans", 60)
 clock = pygame.time.Clock()
-start_time = False
-High_score = "High_score.txt"
-with open(High_score, 'r', encoding='UTF-8') as file:
+
+High_score_file = "High_score.txt"
+with open(High_score_file, 'r', encoding='UTF-8') as file:
     HIGH_SCORE = int(file.readline())
 
-Name = "Name.txt"
-with open(Name, 'r', encoding='UTF-8') as file:
+player_name_file = "Name.txt"
+with open(player_name_file, 'r', encoding='UTF-8') as file:
     user_text = file.readline()
 
-font00 = pygame.font.SysFont("comicsans", 55)
 
-player1 = player()
+player1 = Player()
 enemies = [enemy() for i in range(11)]
 cup = Trophy(1493, 722, 40, 68)
 time = Time(1450,0)
+
 if __name__ == '__main__':
     while True:
         play_background_sound()
@@ -381,22 +395,11 @@ if __name__ == '__main__':
 
         while True:
             RedrawGameWindow()
-            start_time = True
+            time.start = True
             clock.tick(FPS)
             if (collapse()):
                 time.restart_time()
-                start_time = False
+                time.start = False
                 break
             check_quit()
-            Keys = pygame.key.get_pressed()
-            if Keys[pygame.K_LEFT] and player1.x > 0 :
-                player1.x -= player1.vel
-
-            elif Keys [pygame.K_RIGHT] and player1.x < 1533 - player1.width:
-                player1.x += player1.vel
-
-            elif Keys [pygame.K_UP] and player1.y > 0 :
-                player1.y -= player1.vel
-
-            elif Keys [pygame.K_DOWN] and player1.y  < 790 - player1.height :
-                player1.y += player1.vel
+            player1.move()
