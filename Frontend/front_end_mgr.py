@@ -1,31 +1,34 @@
 import pygame
 from pygame.locals import *
 
-from ..utilities import load_data
-from ..Backend.backend_mgr import BackEndManager
-
+from data_helper import load_data
+from Backend.backend_mgr import BackEndManager
 
 class FrontEndManager:
 
     def __init__(self):
-        self.bacend_mgr = BackEndManager()
+        self.backend_mgr = BackEndManager()
         self.Display = None
-        self.SCREEN_WIDTH = 1533
-        self.SCREEN_HEIGHT = 790
+        self.SCREEN_WIDTH = 1233
+        self.SCREEN_HEIGHT = 640
         self.caption = "CLUBS FIGHT"
-        self.teams, self.background, self.cup = load_data()
+        self.time_x_pos = 1100
+        self.time_y_pos = 0
+        self.teams, self.background_img, self.cup_img = load_data()
         self.BLACK = (0, 0, 0)
         self.WHITE = (255, 255, 255)
         self.RED = (255, 0, 0)
+        self.GREEN = (0, 255, 0)
+        self.BLUE = (0, 0, 255)
         self.SILVER = (192, 192, 192)
-        self.BUTTONS_WIDTH = 250
-        self.BUTTONS_HEIGHT = 60
-        self.FPS = 2000
+        self.BUTTONS_WIDTH = 180
+        self.BUTTONS_HEIGHT = 50
+        self.user_text = ''
 
     @staticmethod
     def play_background_sound():
         pygame.mixer.music.stop()
-        pygame.mixer.music.load("UEFA.mp3")
+        pygame.mixer.music.load("Frontend/sounds/UEFA.mp3")
         pygame.mixer.music.play(-1)
 
     @staticmethod
@@ -35,13 +38,16 @@ class FrontEndManager:
                 pygame.quit()
 
     def display_background_image(self):
-        self.Display.blit(self.background, (0, 0))
+        self.Display.blit(self.background_img, (0, 0))
+
+    def display_image(self, img, pos):
+        self.Display.blit(img, pos)
 
     def write_on_screen(self, font_type, font_size, font_color, message, pos_x, pos_y, take_width=False):
         font = pygame.font.SysFont(font_type, font_size)
         text = font.render(message, 1, font_color)
         if take_width:
-            self.Display.blit(text, (766 - (text.get_width() / 2), pos_y))
+            self.Display.blit(text, (616 - (text.get_width() / 2), pos_y))
         else:
             self.Display.blit(text, (pos_x, pos_y))
 
@@ -55,26 +61,26 @@ class FrontEndManager:
     def game_intro(self):
         while True:
             self.display_background_image()
-            self.write_on_screen("comicsans", 100, self.WHITE, "CLUBS FIGHT", 766 - (750 // 2), 150)
-            pygame.draw.rect(self.Display, self.WHITE, (350, 490, self.BUTTONS_WIDTH, self.BUTTONS_HEIGHT))
-            self.write_on_screen("comicsans", 55, self.BLACK, "Play", 430, 475)
-            pygame.draw.rect(self.Display, self.WHITE, (850, 490, self.BUTTONS_WIDTH, self.BUTTONS_HEIGHT))
-            self.write_on_screen("comicsans", 45, self.BLACK, "High Score", 860, 485)
-            self.write_on_screen("comicsans", 30, self.WHITE,
+            self.write_on_screen("comicsans", 70, self.WHITE, "CLUBS FIGHT", 616, 150, True)
+            pygame.draw.rect(self.Display, self.WHITE, (305, 402, self.BUTTONS_WIDTH, self.BUTTONS_HEIGHT)) # 350 490
+            self.write_on_screen("comicsans", 40, self.BLACK, "Play", 360, 395)     # 430, 475
+            pygame.draw.rect(self.Display, self.WHITE, (710, 402, self.BUTTONS_WIDTH, self.BUTTONS_HEIGHT))    # 850, 490
+            self.write_on_screen("comicsans", 33, self.BLACK, "High Score", 713, 398)       # 860, 485
+            self.write_on_screen("comicsans", 22, self.WHITE,
                             "Playing instruction: Use the arrows to avoid the rival and reach the Champions league cup",
-                            150, 700)
+                            140, 574)   #150, 700
             self.check_quit()
             cur = pygame.mouse.get_pos()
             click = pygame.mouse.get_pressed()
-            if 350 + self.BUTTONS_WIDTH > cur[0] > 350 and self.BUTTONS_HEIGHT + 490 > cur[1] > 490:
-                pygame.draw.rect(self.Display, self.SILVER, (350, 490, self.BUTTONS_WIDTH, self.BUTTONS_HEIGHT))
-                self.write_on_screen("comicsans", 55, self.BLACK, "Play", 430, 475)
+            if 305 + self.BUTTONS_WIDTH > cur[0] > 305 and self.BUTTONS_HEIGHT + 402 > cur[1] > 402:
+                pygame.draw.rect(self.Display, self.SILVER, (305, 402, self.BUTTONS_WIDTH, self.BUTTONS_HEIGHT))
+                self.write_on_screen("comicsans", 40, self.BLACK, "Play", 360, 395)
                 if click[0] == 1:
-                    delay_time(50, 5)
+                    self.backend_mgr.delay_time(50, 5)
                     break
-            if 850 + self.BUTTONS_WIDTH > cur[0] > 850 and self.BUTTONS_HEIGHT + 490 > cur[1] > 490:
-                pygame.draw.rect(self.Display, self.SILVER, (850, 490, self.BUTTONS_WIDTH, self.BUTTONS_HEIGHT))
-                self.write_on_screen("comicsans", 45, self.BLACK, "High Score", 860, 485)
+            if 710 + self.BUTTONS_WIDTH > cur[0] > 710 and self.BUTTONS_HEIGHT + 402 > cur[1] > 402:
+                pygame.draw.rect(self.Display, self.SILVER, (710, 402, self.BUTTONS_WIDTH, self.BUTTONS_HEIGHT))
+                self.write_on_screen("comicsans", 33, self.BLACK, "High Score", 713, 398)
                 if click[0] == 1:
                     self.view_high()
             pygame.display.update()
@@ -83,17 +89,18 @@ class FrontEndManager:
         choose = True
         while choose:
             self.display_background_image()
-            positions = [(300, 300), (400, 300), (500, 300), (600, 300), (700, 300), (800, 300), (900, 300),
-                         (1000, 300), (300, 500), (400, 500), (500, 500),
-                         (600, 500), (700, 500), (800, 500), (900, 500), (1000, 500), (1100, 500), (1100, 300),
-                         (1200, 300), (1200, 500)]
+            positions = [(150, 296), (250, 296), (350, 296), (450, 296), (550, 296), (650, 296), (750, 296),
+                         (850, 296), (150, 460), (250, 460), (350, 460),
+                         (450, 460), (550, 460), (650, 460), (750, 460), (850, 460), (950, 460), (950, 296),
+                         (1050, 296), (1050, 460)]      # 300 to 246, 500 to 410
 
             for idx, team in enumerate(self.teams):
                 team.pos_x, team.pos_y = positions[idx]
+                team.display = self.Display
                 team.draw_logo()
                 team.is_turn = False
 
-            self.write_on_screen("comicsans", 70, self.WHITE, "Choose a team to start the game", 230, 110)
+            self.write_on_screen("comicsans", 50, self.WHITE, "Choose a team to start the game", 170, 90, True)  # 230, 110
             self.check_quit()
 
             cur = pygame.mouse.get_pos()
@@ -104,59 +111,73 @@ class FrontEndManager:
                         team.is_turn = True
                         team.play_chant()
                         choose = False
-                        delay_time(50, 5)
+                        self.backend_mgr.delay_time(50, 5)
                         break
             pygame.display.update()
 
     def view_high(self):
         while True:
             self.display_background_image()
-            self.write_on_screen("comicsans", 70, self.WHITE, "HIGH SCORE", 525, 175)
-            self.write_on_screen("comicsans", 70, self.WHITE, user_text + ': ' + str(HIGH_SCORE) + " seconds", 410, 340, True)
-            pygame.draw.rect(self.Display, self.WHITE, (620, 550, self.BUTTONS_WIDTH, self.BUTTONS_HEIGHT))
-            self.write_on_screen("comicsans", 55, self.BLACK, "Back", 680, 540)
+            self.write_on_screen("comicsans", 50, self.WHITE, "HIGH SCORE", 420, 143, True)   #525, 175
+            self.write_on_screen("comicsans", 50, self.WHITE, self.backend_mgr.get_high_score_user_name + ': ' + str(self.backend_mgr.get_high_score) + " seconds", 330, 280, True)     # 410, 340
+            pygame.draw.rect(self.Display, self.WHITE, (515, 450, self.BUTTONS_WIDTH, self.BUTTONS_HEIGHT))     # 620, 550
+            self.write_on_screen("comicsans", 40, self.BLACK, "Back", 560, 445)     #680, 540
             self.check_quit()
             cur = pygame.mouse.get_pos()
             click = pygame.mouse.get_pressed()
-            if 620 + self.BUTTONS_WIDTH > cur[0] > 620 and self.BUTTONS_HEIGHT + 550 > cur[1] > 550:
-                pygame.draw.rect(self.Display, self.SILVER, (620, 550, self.BUTTONS_WIDTH, self.BUTTONS_HEIGHT))
-                self.write_on_screen("comicsans", 55, self.BLACK, "Back", 680, 540)
+            if 515 + self.BUTTONS_WIDTH > cur[0] > 515 and self.BUTTONS_HEIGHT + 450 > cur[1] > 450:
+                pygame.draw.rect(self.Display, self.SILVER, (515, 450, self.BUTTONS_WIDTH, self.BUTTONS_HEIGHT))
+                self.write_on_screen("comicsans", 40, self.BLACK, "Back", 560, 445)
                 if click[0] == 1:
                     break
             pygame.display.update()
 
 
     def entry(self):
-        global user_text
         while True:
+            self.play_background_sound()
             self.display_background_image()
-            self.write_on_screen("comicsans", 60, self.WHITE, "Type your name:", 490, 175, True)
+            self.write_on_screen("comicsans", 45, self.WHITE, "Type your name:", 390, 145, True)    # 490, 175
             for event in pygame.event.get():
                 if event.type == QUIT:
                     pygame.quit()
                 if event.type == KEYDOWN:
                     if event.key == K_BACKSPACE:
-                        user_text = user_text[:-1]
+                        self.user_text = self.user_text[:-1]
                     else:
-                        user_text += event.unicode
+                        self.user_text += event.unicode
 
-            self.write_on_screen("comicsans", 60, self.WHITE, user_text, 490, 340, True)
-            pygame.draw.rect(self.Display, self.WHITE, (620, 550, self.BUTTONS_WIDTH, self.BUTTONS_HEIGHT))
-            self.write_on_screen("comicsans", 60, self.BLACK, "Save", 685, 530)
+            self.write_on_screen("comicsans", 45, self.WHITE, self.user_text, 390, 280, True)
+            pygame.draw.rect(self.Display, self.WHITE, (515, 450, self.BUTTONS_WIDTH, self.BUTTONS_HEIGHT))  # 620, 550
+            self.write_on_screen("comicsans", 40, self.BLACK, "Save", 560, 445)  # 680, 540
 
             cur = pygame.mouse.get_pos()
             click = pygame.mouse.get_pressed()
-            if 620 + self.BUTTONS_WIDTH > cur[0] > 620 and self.BUTTONS_HEIGHT + 550 > cur[1] > 550:
-                pygame.draw.rect(self.Display, self.SILVER, (620, 550, self.BUTTONS_WIDTH, self.BUTTONS_HEIGHT))
-                self.write_on_screen("comicsans", 60, self.BLACK, "Save", 685, 530)
+            if 515 + self.BUTTONS_WIDTH > cur[0] > 515 and self.BUTTONS_HEIGHT + 450 > cur[1] > 450:
+                pygame.draw.rect(self.Display, self.SILVER,
+                                 (515, 450, self.BUTTONS_WIDTH, self.BUTTONS_HEIGHT))  # 620, 550
+                self.write_on_screen("comicsans", 40, self.BLACK, "Save", 560, 445)
                 if click[0] == 1:
-                    with open(player_name_file, 'w', encoding='UTF-8') as file:
-                        file.write(user_text)
-                    with open(High_score_file, 'w', encoding='UTF-8') as file:
-                        file.write(str(HIGH_SCORE))
+                    self.backend_mgr.write_on_user_name_file(self.user_text)
+                    self.backend_mgr.write_on_high_score_file(self.backend_mgr.get_high_score)
                     break
             pygame.display.update()
 
+
+    def print_lose(self):
+        self.write_on_screen("comicsans", 70, self.RED, "YOU LOSE", 390, 280, True)
+        pygame.display.update()
+        self.backend_mgr.delay_time(200, 10)
+
+    def print_win(self):
+        self.write_on_screen("comicsans", 70, self.GREEN, "CONGRATS , YOU WON", 390, 280, True)
+        pygame.display.update()
+        self.backend_mgr.delay_time(200, 10)
+
+    def print_high_score(self):
+        self.write_on_screen("comicsans", 45, self.BLUE, "New High Score!!!", 390, 450, True)
+        pygame.display.update()
+        self.backend_mgr.delay_time(200, 10)
 
     def RedrawGameWindow(self):
         self.Display.fill(self.BLACK)
@@ -164,29 +185,45 @@ class FrontEndManager:
             if team.is_turn:
                 team.draw_stad()
                 break
-        time.draw(self.Display)
-        player1.draw()
-        for enemy in enemies:
-            enemy.draw()
-        self.cup.draw(self.Display)
+
+        for team in self.teams:
+            if team.is_turn:
+                team.pos_x, team.pos_y = self.backend_mgr.player1.get_position()
+                team.draw_logo()
+                break
+
+        for team in self.teams:
+            if team.is_turn:
+                for enemy in self.backend_mgr.enemies:
+                    team.rival_pos_x, team.rival_pos_y= enemy.get_position()
+                    team.draw_rival()
+                break
+
+        self.write_on_screen("comicsans", 45, self.WHITE, f'{self.backend_mgr.time.get_seconds}', self.time_x_pos, self.time_y_pos)
+        self.display_image(self.cup_img,self.backend_mgr.cup.get_position())    # Should i make cup class like team? i don't know
+
         pygame.display.update()
 
 
     def run(self):
-
-
+        self.init_screen()
+        self.user_text = ''
         while True:
             self.play_background_sound()
             self.game_intro()
             self.choose()
-
+            self.backend_mgr.restart_all()
             while True:
                 self.RedrawGameWindow()
-                time.start = True
-                clock.tick(self.FPS)
-                if (collapse()):
-                    time.restart_time()
-                    time.start = False
+                action = self.backend_mgr.game_scenario()
+                if action != 1:
+                    if action == 2:
+                        self.print_lose()
+                    elif action == 3 or action == 4:
+                        self.print_win()
+                        if action == 4:
+                            self.print_high_score()
+                            self.entry()
+
                     break
                 self.check_quit()
-                player1.move()

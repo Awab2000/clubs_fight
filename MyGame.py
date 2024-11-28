@@ -373,11 +373,11 @@ teams = [Liv, ManU, Atl, Rma, Fcb, Val, Int, Mil, Juv, Rom, Laz, Ars, Che, City,
 
 clock = pygame.time.Clock()
 
-High_score_file = "High_score.txt"
+High_score_file = "Backend/High_score.txt"
 with open(High_score_file, 'r', encoding='UTF-8') as file:
     HIGH_SCORE = int(file.readline())
 
-player_name_file = "Name.txt"
+player_name_file = "Backend/Name.txt"
 with open(player_name_file, 'r', encoding='UTF-8') as file:
     user_text = file.readline()
 
