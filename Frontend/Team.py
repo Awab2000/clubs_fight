@@ -3,7 +3,7 @@ from pygame.locals import *
 
 
 class Team:
-    def __init__(self, logo_image, stad_image, chant, rival_image, pos_x, pos_y, rival_pos_x, rival_pos_y, is_turn = False, width = 31, height = 42):
+    def __init__(self, logo_image, stad_image, chant, rival_image, pos_x, pos_y, rival_pos_x, rival_pos_y, is_player1 = False, is_player2 = False, width = 31, height = 42):
         self.logo_image = pygame.image.load(logo_image)
         self.stad_image = pygame.image.load(stad_image)
         self.chant = chant
@@ -12,7 +12,8 @@ class Team:
         self.pos_y = pos_y
         self.rival_pos_x = rival_pos_x
         self.rival_pos_y = rival_pos_y
-        self.is_turn = is_turn
+        self.is_player1 = is_player1
+        self.is_player2 = is_player2
         self.width = width
         self.height = height
         self.display = None
