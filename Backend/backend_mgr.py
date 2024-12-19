@@ -157,8 +157,6 @@ class BackEndManager:
                 if self.player1.hitbox[0] + self.player1.hitbox[2] > enemy.hitbox[0] and self.player1.hitbox[0] < enemy.hitbox[0] + \
                         enemy.hitbox[2]:
                     self.player1.restart_position()
-
-        for enemy in self.enemies:
             if self.is_ai:
                 if self.ai_player.hitbox[1] < enemy.hitbox[1] + enemy.hitbox[3] and self.ai_player.hitbox[1] + self.ai_player.hitbox[3] > \
                         enemy.hitbox[1]:
@@ -171,6 +169,7 @@ class BackEndManager:
                     if self.player2.hitbox[0] + self.player2.hitbox[2] > enemy.hitbox[0] and self.player2.hitbox[0] < enemy.hitbox[0] + \
                             enemy.hitbox[2]:
                         self.player2.restart_position(1190,50)
+
 
         if self.player1.hitbox[1] < self.cup.hitbox[1] + self.cup.hitbox[3] and self.player1.hitbox[1] + self.player1.hitbox[3] > self.cup.hitbox[
             1]:
@@ -214,18 +213,18 @@ class BackEndManager:
         self._clock.tick(self.FPS)
         self.time.start = True
         self.time.move_time()
-        ret = self.collapse()
-        if ret != 1:
-            self.time.restart_time()
-            return ret
         for enemy in self.enemies:
             enemy.move(self.SCREEN_WIDTH, self.SCREEN_HEIGHT)
-        self.player1.move_p1(self.SCREEN_WIDTH, self.SCREEN_HEIGHT)
         if self.is_ai:
             state = self.get_state()
             action = self.get_action(state)
             self.ai_player.move(action, self.SCREEN_WIDTH, self.SCREEN_HEIGHT)
         else:
             self.player2.move_p2(self.SCREEN_WIDTH, self.SCREEN_HEIGHT)
+        self.player1.move_p1(self.SCREEN_WIDTH, self.SCREEN_HEIGHT)
+        ret = self.collapse()
+        if ret != 1:
+            self.time.restart_time()
+            return ret
 
         return ret

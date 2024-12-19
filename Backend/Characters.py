@@ -25,12 +25,12 @@ class Character(ABC):
         pass
 
 class Player(Character):
-    def __init__(self,x = 12, y = 50, width = 31, height = 42):
+    def __init__(self,x = 45, y = 50, width = 31, height = 42):
         self.x = x
         self.y = y
         self.width = width
         self.height = height
-        self.vel = 12
+        self.vel = 16
         self.score = 0
         self.hitbox = (self.x , self.y, self.width, self.height)
 
@@ -39,10 +39,10 @@ class Player(Character):
 
     def move_p1(self, SCREEN_WIDTH, SCREEN_HEIGHT):
         Keys = pygame.key.get_pressed()
-        if Keys[pygame.K_LEFT] and self.x > 0:
+        if Keys[pygame.K_LEFT] and self.x > 45: # 0
             self.x -= self.vel
 
-        elif Keys[pygame.K_RIGHT] and self.x < (SCREEN_WIDTH - self.width - 2):
+        elif Keys[pygame.K_RIGHT] and self.x < (SCREEN_WIDTH - self.width - 10):
             self.x += self.vel
 
         elif Keys[pygame.K_UP] and self.y > 2:
@@ -55,10 +55,10 @@ class Player(Character):
 
     def move_p2(self, SCREEN_WIDTH, SCREEN_HEIGHT):
         Keys = pygame.key.get_pressed()
-        if Keys[pygame.K_a] and self.x > 0:
+        if Keys[pygame.K_a] and self.x > 45:
             self.x -= self.vel
 
-        elif Keys[pygame.K_d] and self.x < (SCREEN_WIDTH - self.width - 2):
+        elif Keys[pygame.K_d] and self.x < (SCREEN_WIDTH - self.width - 10):
             self.x += self.vel
 
         elif Keys[pygame.K_w] and self.y > 2:
@@ -69,7 +69,7 @@ class Player(Character):
 
         self.hitbox = (self.x, self.y, self.width, self.height)
 
-    def restart_position(self, x = 12, y = 50):
+    def restart_position(self, x = 45, y = 50): # 12 50
         self.x = x
         self.y = y
         self.hitbox = (self.x, self.y, self.width, self.height)
@@ -90,7 +90,7 @@ class AI_Player(Character):
         self.y = y
         self.width = width
         self.height = height
-        self.vel = 12
+        self.vel = 16
         self.score = 0
         self.direction = Direction.DOWN
         self.hitbox = (self.x , self.y, self.width, self.height)
@@ -107,7 +107,7 @@ class AI_Player(Character):
         self._move(SCREEN_WIDTH, SCREEN_HEIGHT)
 
     def _move(self, SCREEN_WIDTH, SCREEN_HEIGHT):
-        if self.direction == Direction.LEFT and self.x > 0:
+        if self.direction == Direction.LEFT and self.x > 45:
             self.x -= self.vel
         elif self.direction == Direction.RIGHT and self.x < (SCREEN_WIDTH - self.width - 2):
             self.x += self.vel
@@ -140,8 +140,8 @@ class enemy(Character):
         self.y = random.randint(200,500)
         self.width = width
         self.height = height
-        self.speedx = 10
-        self.speedy = 10
+        self.speedx = 13
+        self.speedy = 13
         self.hitbox = (self.x, self.y, self.width, self.height)
 
 
@@ -166,7 +166,7 @@ class enemy(Character):
 
 class Trophy(Character):
     def __init__(self, x = 0, y = 0, width = 31, height = 53):
-        self.x = random.randint(0, 1200)
+        self.x = random.randint(40, 1180)
         self.y = random.randint(0, 585)
         self.height = height
         self.width = width
@@ -178,6 +178,6 @@ class Trophy(Character):
 
 
     def restart_position(self):
-        self.x = random.randint(0,1200)
+        self.x = random.randint(40,1180)
         self.y = random.randint(0,585)
         self.hitbox = (self.x, self.y, self.width, self.height)
