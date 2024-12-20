@@ -22,5 +22,5 @@ I'd encourage you to clone and rename this project to use for your own puposes.
 You will need to install the following libraries: pygame, pytorch, numpy
 
 ## Known issues
-The model is most likely wont go up, unlike left,right and down
-The agent will move only if the opponent is at x position >= ~45
+- The model is most likely wont go up, unlike left,right and down
+- The agent will move only if the opponent is at x position >= ~45
