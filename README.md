@@ -19,7 +19,11 @@ The game has a variety of choosing options of teams and stadiums, so you can cho
 
 ## How to configure this project for your own uses
 I'd encourage you to clone and rename this project to use for your own puposes.
-You will need to install the following libraries: pygame, pytorch, numpy
+
+You will need to install the following libraries: pygame, pytorch, numpy.
+
+You can also see the clubs_fight_train_AI repo if you want to configure the model:
+[AI training repo](https://github.com/Awab2000/clubs_fight_train_ai)
 
 ## Known issues
 - The model is most likely wont go up, unlike left,right and down
